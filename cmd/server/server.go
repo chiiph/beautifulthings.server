@@ -17,7 +17,7 @@ func main() {
 
 	cancel, err := server.ServeRest(context.Background(), addr, store.NewInMemoryServer())
 	if err != nil {
-		log.Fatal("Error starting server: %s", err)
+		log.Fatalf("Error starting server: %s", err)
 	}
 
 	c := make(chan os.Signal, 1)
