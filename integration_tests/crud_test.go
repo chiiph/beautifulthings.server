@@ -53,8 +53,7 @@ func enumerate(t *testing.T, token string, s server.Server, a *account.Account, 
 	return got
 }
 
-func TestAddEnumerate(t *testing.T) {
-	s := server.New(store.NewInMemoryServer())
+func testAddEnumerate(t *testing.T, s server.Server) {
 	a := signup(t, s, "user1", "pass")
 
 	token := signin(t, s, a)
@@ -73,8 +72,12 @@ func TestAddEnumerate(t *testing.T) {
 	require.Equal(t, items, got)
 }
 
-func TestAddEnumerateSkipOutside(t *testing.T) {
+func TestAddEnumerate(t *testing.T) {
 	s := server.New(store.NewInMemoryServer())
+	testAddEnumerate(t, s)
+}
+
+func testAddEnumerateSkipOutside(t *testing.T, s server.Server) {
 	a := signup(t, s, "user1", "pass")
 
 	token := signin(t, s, a)
@@ -93,4 +96,9 @@ func TestAddEnumerateSkipOutside(t *testing.T) {
 	got := enumerate(t, token, s, a, "2018-01-01", "2018-01-30")
 	require.Len(t, got, 3)
 	require.Equal(t, items[:3], got)
+}
+
+func TestAddEnumerateSkipOutside(t *testing.T) {
+	s := server.New(store.NewInMemoryServer())
+	testAddEnumerateSkipOutside(t, s)
 }

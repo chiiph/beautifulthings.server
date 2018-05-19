@@ -8,6 +8,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"fmt"
+
+	"net/url"
+
+	"path"
+
 	"github.com/pkg/errors"
 )
 
@@ -41,10 +47,10 @@ func (rs *remoteRestServer) SignIn(b []byte) ([]byte, error) {
 		return nil, errors.Errorf("Error signing up: %d", resp.StatusCode)
 	}
 	sirb, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	defer resp.Body.Close()
 	sir := &SignInResponse{}
 	err = json.Unmarshal(sirb, sir)
 	if err != nil {
@@ -53,10 +59,54 @@ func (rs *remoteRestServer) SignIn(b []byte) ([]byte, error) {
 	return sir.EncryptedToken, nil
 }
 
+func (rs *remoteRestServer) urlWithToken(token string, section ...string) string {
+	return fmt.Sprintf("%s/%s?token=%s", rs.addr, path.Join(section...), url.QueryEscape(token))
+}
+
 func (rs *remoteRestServer) Set(token string, date string, ct []byte) error {
-	panic("not implemented")
+	sr := SetRequest{
+		Date: date,
+		Ct:   ct,
+	}
+	b, err := json.Marshal(sr)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	resp, err := http.Post(
+		rs.urlWithToken(token, "things"),
+		"application/octet-stream",
+		bytes.NewReader(b),
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.Errorf("Error setting beautiful thing: %d", resp.StatusCode)
+	}
+	return nil
 }
 
 func (rs *remoteRestServer) Enumerate(token string, from, to string) ([]store.BeautifulThing, error) {
-	panic("not implemented")
+	resp, err := http.Get(rs.urlWithToken(token, "things", from, to))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("Error setting beautiful thing: %d", resp.StatusCode)
+	}
+
+	thingsb, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer resp.Body.Close()
+
+	var things []store.BeautifulThing
+	err = json.Unmarshal(thingsb, &things)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return things, nil
 }

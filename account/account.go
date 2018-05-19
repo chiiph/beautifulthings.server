@@ -7,13 +7,13 @@ import (
 
 	"path"
 
-	"bytes"
-
 	"crypto/rand"
 
 	"os"
 
 	"beautifulthings/utils"
+
+	"bytes"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"

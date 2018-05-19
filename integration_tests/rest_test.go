@@ -50,3 +50,17 @@ func TestRestBasicSignIn(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 }
+
+func TestRestAddEnumerate(t *testing.T) {
+	cancel := startRestServer(t)
+	defer cancel()
+	s := server.NewRemoteRest("http://" + addr)
+	testAddEnumerate(t, s)
+}
+
+func TestRestAddEnumerateSkipOutside(t *testing.T) {
+	cancel := startRestServer(t)
+	defer cancel()
+	s := server.NewRemoteRest("http://" + addr)
+	testAddEnumerateSkipOutside(t, s)
+}
