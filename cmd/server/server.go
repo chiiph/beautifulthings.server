@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	const addr = "localhost:8080"
+	const addr = ":8080"
 
 	log.Println("Starting server at", addr)
 

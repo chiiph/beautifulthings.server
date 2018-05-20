@@ -2,6 +2,7 @@ package integration_tests
 
 import (
 	"context"
+	"os/exec"
 	"testing"
 
 	"beautifulthings/server"
@@ -15,6 +16,20 @@ const addr = "localhost:8080"
 func startRestServer(t *testing.T) func() {
 	cancel, err := server.ServeRest(context.Background(), addr, store.NewInMemoryServer())
 	require.NoError(t, err)
+	return cancel
+}
+
+func runDockerServer(t *testing.T) func() {
+	cmd := exec.Command("docker", "build", "-t", "beautifulthings:latest", "..")
+	err := cmd.Run()
+	require.NoError(t, err)
+
+	cmd = exec.Command("docker", "run", "--rm", "beautifulthings")
+	err = cmd.Start()
+	require.NoError(t, err)
+	cancel := func() {
+		cmd.Process.Kill()
+	}
 	return cancel
 }
 
@@ -37,6 +52,13 @@ var serverBuilders = []serverTest{
 			return server.NewRemoteRest("http://" + addr), cancel
 		},
 	},
+	// {
+	// 	"DockerRest",
+	// 	func(t *testing.T) (server.Server, func()) {
+	// 		cancel := runDockerServer(t)
+	// 		return server.NewRemoteRest("http://" + addr), cancel
+	// 	},
+	// },
 }
 
 type serverIter struct {

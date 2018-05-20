@@ -9,4 +9,5 @@ RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o serv ./cmd/server
 FROM alpine:latest
 WORKDIR /root/
 COPY --from=builder /go/src/beautifulthings/serv .
+EXPOSE 8080/tcp
 CMD ["./serv"]
