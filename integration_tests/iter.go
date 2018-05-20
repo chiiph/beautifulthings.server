@@ -28,7 +28,8 @@ func runDockerServer(t *testing.T) func() {
 	err = cmd.Start()
 	require.NoError(t, err)
 	cancel := func() {
-		cmd.Process.Kill()
+		err = cmd.Process.Kill()
+		require.NoError(t, err)
 	}
 	return cancel
 }
