@@ -1,19 +1,13 @@
 package account
 
 import (
-	"time"
-
-	"encoding/json"
-
-	"path"
-
-	"crypto/rand"
-
-	"os"
-
 	"beautifulthings/utils"
-
 	"bytes"
+	"crypto/rand"
+	"encoding/json"
+	"os"
+	"path"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
@@ -115,7 +109,7 @@ func (a *Account) Validate() error {
 	if len(a.Username) == 0 {
 		return errors.New("Username too short")
 	}
-	if len(a.Pk) != 32 {
+	if a.Pk == nil {
 		return errors.New("public key too short")
 	}
 	// TODO: validate timezone + offset
