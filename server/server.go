@@ -20,11 +20,11 @@ type Server interface {
 }
 
 type server struct {
-	store   store.ServerStore
+	store   store.ObjectStore
 	session *cache.Cache
 }
 
-func New(store store.ServerStore) Server {
+func New(store store.ObjectStore) Server {
 	return &server{
 		store:   store,
 		session: cache.New(24*time.Hour, 24*time.Hour),

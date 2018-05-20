@@ -8,11 +8,11 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func NewInMemory(a *account.Account) Store {
+func NewInMemory(a *account.Account) ObjectStore {
 	return nil
 }
 
-func NewInMemoryServer() ServerStore {
+func NewInMemoryServer() ObjectStore {
 	return &memServerStore{
 		c: cache.New(cache.NoExpiration, cache.NoExpiration),
 	}

@@ -116,7 +116,7 @@ func (rs *RestServer) enumerate(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func ServeRest(ctx context.Context, addr string, store store.ServerStore) (func(), error) {
+func ServeRest(ctx context.Context, addr string, store store.ObjectStore) (func(), error) {
 	rs := &RestServer{
 		s: New(store),
 	}
