@@ -4,6 +4,7 @@ import (
 	"context"
 	"os/exec"
 	"testing"
+	"time"
 
 	"beautifulthings/server"
 	"beautifulthings/store"
@@ -16,6 +17,7 @@ const addr = "localhost:8080"
 func startRestServer(t *testing.T) func() {
 	cancel, err := server.ServeRest(context.Background(), addr, store.NewInMemoryServer())
 	require.NoError(t, err)
+	<-time.After(50 * time.Millisecond)
 	return cancel
 }
 
