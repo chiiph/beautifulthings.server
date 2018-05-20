@@ -4,9 +4,8 @@ import (
 	"beautifulthings/account"
 	"beautifulthings/server"
 	"beautifulthings/store"
-	"testing"
-
 	"os"
+	"testing"
 
 	"github.com/stretchr/testify/require"
 )

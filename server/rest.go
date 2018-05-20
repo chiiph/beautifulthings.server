@@ -1,16 +1,12 @@
 package server
 
 import (
-	"net/http"
-
-	"context"
-	"log"
-
 	"beautifulthings/store"
-
-	"io/ioutil"
-
+	"context"
 	"encoding/json"
+	"io/ioutil"
+	"log"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )

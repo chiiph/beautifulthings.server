@@ -2,11 +2,9 @@ package server
 
 import (
 	"beautifulthings/account"
+	"beautifulthings/store"
 	"beautifulthings/utils"
 	"path/filepath"
-
-	"beautifulthings/store"
-
 	"time"
 
 	"github.com/pkg/errors"

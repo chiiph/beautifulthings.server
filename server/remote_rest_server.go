@@ -3,15 +3,11 @@ package server
 import (
 	"beautifulthings/store"
 	"bytes"
-	"net/http"
-
 	"encoding/json"
-	"io/ioutil"
-
 	"fmt"
-
+	"io/ioutil"
+	"net/http"
 	"net/url"
-
 	"path"
 
 	"github.com/pkg/errors"

@@ -1,11 +1,10 @@
 package integration_tests
 
 import (
+	"beautifulthings/account"
 	"beautifulthings/server"
 	"beautifulthings/store"
 	"testing"
-
-	"beautifulthings/account"
 
 	"github.com/stretchr/testify/require"
 )

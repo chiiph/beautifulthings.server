@@ -2,11 +2,8 @@ package server
 
 import (
 	"beautifulthings/account"
-
 	"beautifulthings/store"
-
 	"crypto/rand"
-
 	"encoding/base64"
 
 	"github.com/pkg/errors"

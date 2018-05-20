@@ -2,7 +2,6 @@ package server
 
 import (
 	"beautifulthings/store"
-
 	"time"
 
 	"github.com/patrickmn/go-cache"
