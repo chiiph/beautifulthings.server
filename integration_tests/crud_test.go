@@ -1,56 +1,11 @@
 package integration_tests
 
 import (
-	"beautifulthings/account"
 	"beautifulthings/server"
-	"beautifulthings/store"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
-
-func set(t *testing.T, s server.Server, a *account.Account, token string, date, content string) {
-	ct, err := a.Encrypt(content)
-	require.NoError(t, err)
-	err = s.Set(token, date, ct)
-	require.NoError(t, err)
-}
-
-func signin(t *testing.T, s server.Server, a *account.Account) string {
-	b := accBytes(t, a)
-
-	cipherToken, err := s.SignIn(b)
-	require.NoError(t, err)
-	require.NotEmpty(t, cipherToken)
-
-	token, err := a.Decrypt(cipherToken)
-	require.NoError(t, err)
-	require.NotEmpty(t, token)
-
-	return token
-}
-
-type item struct {
-	date    string
-	content string
-}
-
-func enumerate(t *testing.T, token string, s server.Server, a *account.Account, from, to string) []item {
-	res, err := s.Enumerate(token, from, to)
-	require.NoError(t, err)
-
-	var got []item
-	for _, ctit := range res {
-		m, err := a.Decrypt(ctit.Content)
-		require.NoError(t, err)
-		it := item{
-			date:    ctit.Date.Format("2006-01-02"),
-			content: m,
-		}
-		got = append(got, it)
-	}
-	return got
-}
 
 func testAddEnumerate(t *testing.T, s server.Server) {
 	a := signup(t, s, "user1", "pass")
@@ -72,8 +27,7 @@ func testAddEnumerate(t *testing.T, s server.Server) {
 }
 
 func TestAddEnumerate(t *testing.T) {
-	s := server.New(store.NewInMemoryServer())
-	testAddEnumerate(t, s)
+	Run(t, testAddEnumerate)
 }
 
 func testAddEnumerateSkipOutside(t *testing.T, s server.Server) {
@@ -98,6 +52,5 @@ func testAddEnumerateSkipOutside(t *testing.T, s server.Server) {
 }
 
 func TestAddEnumerateSkipOutside(t *testing.T) {
-	s := server.New(store.NewInMemoryServer())
-	testAddEnumerateSkipOutside(t, s)
+	Run(t, testAddEnumerateSkipOutside)
 }

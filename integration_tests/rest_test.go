@@ -2,20 +2,10 @@ package integration_tests
 
 import (
 	"beautifulthings/server"
-	"beautifulthings/store"
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
-
-const addr = "localhost:8080"
-
-func startRestServer(t *testing.T) func() {
-	cancel, err := server.ServeRest(context.Background(), addr, store.NewInMemoryServer())
-	require.NoError(t, err)
-	return cancel
-}
 
 func TestRestBasicSignUp(t *testing.T) {
 	cancel := startRestServer(t)
