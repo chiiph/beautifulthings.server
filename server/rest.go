@@ -112,6 +112,10 @@ func (rs *RestServer) enumerate(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+func (rs *RestServer) healthz(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func ServeRest(ctx context.Context, addr string, store store.ObjectStore) (func(), error) {
 	rs := &RestServer{
 		s: New(store),
@@ -122,6 +126,7 @@ func ServeRest(ctx context.Context, addr string, store store.ObjectStore) (func(
 	r.HandleFunc("/signin", rs.signIn).Methods("POST")
 	r.HandleFunc("/things", rs.set).Methods("POST").Queries("token", "{token}")
 	r.HandleFunc("/things/{from}/{to}", rs.enumerate).Methods("GET").Queries("token", "{token}")
+	r.HandleFunc("/healthz", rs.healthz).Methods("GET")
 
 	srv := http.Server{
 		Addr:    addr,

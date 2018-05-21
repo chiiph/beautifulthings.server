@@ -5,13 +5,13 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: chiiph/beautifulthings
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
 
 ingress:
   enabled: false
@@ -43,3 +43,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
