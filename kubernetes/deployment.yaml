@@ -1,0 +1,29 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: beautifulthings
+  labels: {app: beautifulthings}
+spec:
+  replicas: 1
+  template:
+    metadata: {labels: {app: beautifulthings}}
+    spec:
+      containers:
+        - name: beautifulthings
+          image: docker.io/chiiph/beautifulthings:${TAG}
+          ports:
+            - containerPort: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: beautifulthings
+spec:
+#  type: LoadBalancer
+  type: NodePort
+  selector:
+    app: beautifulthings
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
