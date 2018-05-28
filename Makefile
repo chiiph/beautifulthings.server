@@ -15,7 +15,7 @@ build:
 pack: build
 	docker build -t docker.io/chiiph/beautifulthings:$(TAG) .
 
-upload:
+upload: pack
 	docker push docker.io/chiiph/beautifulthings:$(TAG)
 
 deploy:

@@ -1,7 +1,7 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: beautifulthings
+  name: beautifulthings-dep
   labels: {app: beautifulthings}
 spec:
   replicas: 1
@@ -13,11 +13,21 @@ spec:
           image: docker.io/chiiph/beautifulthings:${TAG}
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 1
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 10
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: beautifulthings
+  name: beautifulthings-svc
+  labels:
+    app: beautifulthings
 spec:
 #  type: LoadBalancer
   type: NodePort
@@ -25,5 +35,85 @@ spec:
     app: beautifulthings
   ports:
   - protocol: TCP
-    port: 80
+    port: 8080
     targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: beautifulthings-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: beautifulthings-ip
+  labels:
+    app: beautifulthings
+spec:
+  backend:
+    serviceName: beautifulthings-svc
+    servicePort: 8080
+  tls:
+  - secretName: beautifulthings-app-tls
+    hosts:
+    - server.beautifulthings.app
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: beautifulthings-app-tls
+  namespace: default
+spec:
+  secretName: beautifulthings-app-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: server.beautifulthings.app
+  dnsNames:
+  - server.beautifulthings.app
+  acme:
+    config:
+    - http01:
+        ingress: beautifulthings-ingress
+      domains:
+      - server.beautifulthings.app
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: helm
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: helm
+    namespace: kube-system
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: 'chiiph@gmail.com'
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    http01: {}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: 'chiiph@gmail.com'
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    http01: {}
