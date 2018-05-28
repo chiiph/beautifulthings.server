@@ -44,7 +44,7 @@ func (g *gcsStore) Get(url string) ([]byte, error) {
 
 	r, err := obj.NewReader(ctx)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, ErrNotFound
 	}
 	defer r.Close()
 	buf := new(bytes.Buffer)
