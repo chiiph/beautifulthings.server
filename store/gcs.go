@@ -19,7 +19,7 @@ func NewGCS() ObjectStore {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	bucketName := "main"
+	bucketName := "bt-main"
 
 	bucket := client.Bucket(bucketName)
 
