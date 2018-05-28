@@ -9,6 +9,8 @@ RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o serv ./cmd/server
 
 FROM alpine:latest
 WORKDIR /root/
+RUN apk add --no-cache ca-certificates
 COPY --from=builder /go/src/beautifulthings/serv .
+ENV GOOGLE_APPLICATION_CREDENTIALS /etc/gcs/gcs.json
 EXPOSE 8080/tcp
 CMD ["./serv"]

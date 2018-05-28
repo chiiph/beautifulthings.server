@@ -13,6 +13,10 @@ spec:
           image: docker.io/chiiph/beautifulthings:${TAG}
           ports:
             - containerPort: 8080
+          volumeMounts:
+          - name: gcs
+            mountPath: "/etc/gcs"
+            readOnly: true
           readinessProbe:
             httpGet:
               path: /healthz
@@ -21,6 +25,13 @@ spec:
             timeoutSeconds: 1
             successThreshold: 1
             failureThreshold: 10
+      volumes:
+      - name: gcs
+        secret:
+          secretName: gcs
+          items:
+          - key: BeautifulThings-8ab395939a12.json
+            path: gcs.json
 ---
 kind: Service
 apiVersion: v1

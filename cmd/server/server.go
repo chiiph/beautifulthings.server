@@ -15,7 +15,7 @@ func main() {
 
 	log.Println("Starting server at", addr)
 
-	cancel, err := server.ServeRest(context.Background(), addr, store.NewInMemoryServer())
+	cancel, err := server.ServeRest(context.Background(), addr, store.NewGCS())
 	if err != nil {
 		log.Fatalf("Error starting server: %s", err)
 	}
