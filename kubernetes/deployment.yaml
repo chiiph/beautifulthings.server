@@ -29,7 +29,6 @@ metadata:
   labels:
     app: beautifulthings
 spec:
-#  type: LoadBalancer
   type: NodePort
   selector:
     app: beautifulthings
