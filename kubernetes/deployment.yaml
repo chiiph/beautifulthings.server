@@ -13,6 +13,9 @@ spec:
           image: docker.io/chiiph/beautifulthings:${TAG}
           ports:
             - containerPort: 8080
+          env:
+          - name: STORE
+            value: GCS
           volumeMounts:
           - name: gcs
             mountPath: "/etc/gcs"

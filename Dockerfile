@@ -12,5 +12,6 @@ WORKDIR /root/
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /go/src/beautifulthings/serv .
 ENV GOOGLE_APPLICATION_CREDENTIALS /etc/gcs/gcs.json
+ENV STORE memory
 EXPOSE 8080/tcp
 CMD ["./serv"]
