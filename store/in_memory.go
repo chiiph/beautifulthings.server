@@ -1,14 +1,8 @@
 package store
 
 import (
-	"beautifulthings/account"
-
 	"github.com/patrickmn/go-cache"
 )
-
-func NewInMemory(a *account.Account) ObjectStore {
-	return nil
-}
 
 func NewInMemoryServer() ObjectStore {
 	return &memServerStore{

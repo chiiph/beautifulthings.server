@@ -53,6 +53,15 @@
   version = "v1.6.2"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/golang-lru"
+  packages = [
+    ".",
+    "simplelru"
+  ]
+  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
+
+[[projects]]
   name = "github.com/patrickmn/go-cache"
   packages = ["."]
   revision = "a3647f8e31d79543b2d0f0ae2fe5c379d72cedc0"
@@ -245,6 +254,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c9d7dbfd21faa1792f8ad0b35c6eaf61283e7843492c9b12905c30969c53f2e8"
+  inputs-digest = "dc8dddbc2fce82b26d4f8a0b05a9386b2134d2b60ea1bde8c1a2c5204b2ac4b2"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -17,12 +17,18 @@ func main() {
 
 	var st store.ObjectStore
 
-	log.Println("Store selected: %s", os.Getenv("STORE"))
+	storeType := os.Getenv("STORE")
+	log.Printf("Store selected: %s", storeType)
 
-	if os.Getenv("STORE") == "memory" {
+	switch storeType {
+	case "memory":
 		st = store.NewInMemoryServer()
-	} else {
+	case "gcs":
 		st = store.NewGCS()
+	case "cached+gcs":
+		fallthrough
+	default:
+		st = store.NewCached(store.NewGCS())
 	}
 
 	cancel, err := server.ServeRest(context.Background(), addr, st)

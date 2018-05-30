@@ -15,7 +15,7 @@ spec:
             - containerPort: 8080
           env:
           - name: STORE
-            value: GCS
+            value: cached+gcs
           volumeMounts:
           - name: gcs
             mountPath: "/etc/gcs"

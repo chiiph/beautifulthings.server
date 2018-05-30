@@ -49,6 +49,12 @@ var serverBuilders = []serverTest{
 		func(_ *testing.T) (server.Server, func()) { return server.New(store.NewInMemoryServer()), nil },
 	},
 	{
+		"InMemoryCached",
+		func(_ *testing.T) (server.Server, func()) {
+			return server.New(store.NewCached(store.NewInMemoryServer())), nil
+		},
+	},
+	{
 		"Rest",
 		func(t *testing.T) (server.Server, func()) {
 			cancel := startRestServer(t)
