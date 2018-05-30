@@ -34,6 +34,13 @@ func set(t *testing.T, s server.Server, a *account.Account, token string, date, 
 	require.NoError(t, err)
 }
 
+func setFails(t *testing.T, s server.Server, a *account.Account, token string, date, content string) {
+	ct, err := a.Encrypt(content)
+	require.NoError(t, err)
+	err = s.Set(token, date, ct)
+	require.Error(t, err)
+}
+
 func signin(t *testing.T, s server.Server, a *account.Account) string {
 	b := accBytes(t, a)
 

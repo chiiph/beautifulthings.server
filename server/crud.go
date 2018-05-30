@@ -8,9 +8,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/nacl/box"
 )
 
 const dateLayout = "2006-01-02"
+const contentLength = 240
+const keyLength = 32
 
 func (s *server) Set(token string, date string, ct []byte) error {
 	a, err := s.validateSession(token)
@@ -18,12 +21,20 @@ func (s *server) Set(token string, date string, ct []byte) error {
 		return errors.WithStack(err)
 	}
 
+	exactSize := len("2018-01-01")
+	if len(date) != exactSize {
+		return errors.Errorf("date too long: %d (max %d)", len(date), exactSize)
+	}
+
+	maxContent := contentLength + box.Overhead + keyLength
+	if len(ct) > maxContent {
+		return errors.Errorf("content too long: %d (max %d)", len(ct), maxContent)
+	}
+
 	_, err = time.Parse(dateLayout, date)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	// TODO: validate ct (mainly that it doesn't exceed the size limit)
 
 	err = s.store.Set(btPath(a, date), ct)
 	if err != nil {

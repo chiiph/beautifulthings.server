@@ -12,8 +12,6 @@ import (
 func NewGCS() ObjectStore {
 	ctx := context.Background()
 
-	// projectID := "beautifulthings-204814"
-
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -22,10 +20,6 @@ func NewGCS() ObjectStore {
 	bucketName := "bt-main"
 
 	bucket := client.Bucket(bucketName)
-
-	// if err := bucket.Create(ctx, projectID, nil); err != nil {
-	// 	log.Fatalf("Failed to create bucket: %v", err)
-	// }
 
 	return &gcsStore{
 		c: client,

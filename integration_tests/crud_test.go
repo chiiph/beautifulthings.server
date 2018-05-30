@@ -54,3 +54,23 @@ func testAddEnumerateSkipOutside(t *testing.T, s server.Server) {
 func TestAddEnumerateSkipOutside(t *testing.T) {
 	Run(t, testAddEnumerateSkipOutside)
 }
+
+func testAddTooBig(t *testing.T, s server.Server) {
+	a := signup(t, s, "user1", "pass")
+
+	token := signin(t, s, a)
+
+	maxContent := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+	set(t, s, a, token, "2018-01-01", maxContent)
+	setFails(t, s, a, token, "2018-01-01", maxContent+"A")
+	setFails(t, s, a, token, "2018-01-01 00:12", "A")
+	setFails(t, s, a, token, "2018-01-1", "A")
+}
+
+func TestAddTooBig(t *testing.T) {
+	Run(t, testAddTooBig)
+}
