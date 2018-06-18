@@ -24,7 +24,12 @@ func (s *server) accountExists(b []byte) (*account.Account, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	_, err = s.store.Get(a.StorePath())
+	b, err = s.store.Get(a.StorePath())
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	a, err = account.FromBytes(b)
 
 	// TODO: check that the pub key and the rest are the same as the stored version
 
@@ -32,8 +37,13 @@ func (s *server) accountExists(b []byte) (*account.Account, error) {
 }
 
 func (s *server) SignUp(b []byte) error {
-	a, err := s.accountExists(b)
+	_, err := s.accountExists(b)
 	if err == nil {
+		return ErrAccountExists
+	}
+
+	a, err := account.FromBytes(b)
+	if err != nil {
 		return ErrAccountExists
 	}
 
