@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/json"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -79,7 +78,6 @@ func (a *Account) Encrypt(s string) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	log.Printf("Encrypting: %x, %x, %x, %x, %x\n", epk[:], []byte(s), &nonce, a.Pk, esk)
 	b := box.Seal(epk[:], []byte(s), &nonce, a.Pk, esk)
 	return b, nil
 }
@@ -95,7 +93,6 @@ func (a *Account) Decrypt(c []byte) (string, error) {
 		return "", errors.WithStack(err)
 	}
 
-	log.Printf("Decrypting: %x, %x, %x, %x\n", c[32:], &nonce, &epk, a.Sk)
 	b, ok := box.Open(nil, c[32:], &nonce, &epk, a.Sk)
 	if !ok {
 		return "", errors.WithStack(errors.New("box.Open failed"))
