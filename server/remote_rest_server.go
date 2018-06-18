@@ -40,7 +40,7 @@ func (rs *remoteRestServer) SignIn(b []byte) ([]byte, error) {
 		return nil, errors.WithStack(err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("Error signing up: %d", resp.StatusCode)
+		return nil, errors.Errorf("Error signing in: %d", resp.StatusCode)
 	}
 	sirb, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
