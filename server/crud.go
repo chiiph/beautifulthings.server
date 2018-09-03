@@ -58,13 +58,13 @@ func (s *server) Enumerate(token string, from, to string) ([]store.BeautifulThin
 		return nil, errors.WithStack(err)
 	}
 
-	if !td.After(fd) {
+	if td.Before(fd) {
 		return nil, errors.New("from date needs to be before to date")
 	}
 
 	var list []store.BeautifulThing
 
-	for d := fd; d.Before(td); d = d.AddDate(0, 0, 1) {
+	for d := fd; !d.After(td); d = d.AddDate(0, 0, 1) {
 		ds := d.Format(dateLayout)
 		path := btPath(a, ds)
 		ct, err := s.store.Get(path)
