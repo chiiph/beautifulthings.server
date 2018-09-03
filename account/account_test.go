@@ -27,6 +27,7 @@ func TestAccount_Bytes(t *testing.T) {
 	require.NoError(t, e)
 	// FromBytes is only used in the server, so we don't have a Sk
 	a1.Sk = nil
+	a1.Key = nil
 
 	require.Equal(t, a1, a2)
 }
@@ -89,4 +90,32 @@ func TestAccount_Validate(t *testing.T) {
 	a, e = New("", "")
 	require.NoError(t, e)
 	require.Error(t, a.Validate())
+}
+
+func TestAccount_Sym(t *testing.T) {
+	a, e := New("user", "pass")
+	require.NoError(t, e)
+	require.NotZero(t, a.Key)
+
+	s := "test"
+	ct, err := a.SymEncrypt(s)
+	require.NoError(t, err)
+	require.NotZero(t, ct)
+
+	m, err := a.SymDecrypt(ct)
+	require.NoError(t, err)
+	require.Equal(t, s, m)
+
+	ct2, err := a.SymEncrypt(s)
+	require.NoError(t, err)
+	require.NotZero(t, ct2)
+	require.NotEqual(t, ct, ct2)
+
+	m2, err := a.SymDecrypt(ct2)
+	require.NoError(t, err)
+	require.Equal(t, s, m2)
+
+	ct2 = append(ct2, byte(' '))
+	_, err = a.SymDecrypt(ct2)
+	require.Error(t, err)
 }

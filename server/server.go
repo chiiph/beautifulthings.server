@@ -14,6 +14,8 @@ import (
 type Server interface {
 	SignUp(b []byte) error
 	SignIn(b []byte) ([]byte, error)
+	Bootstrap(token string) ([]byte, error)
+	UpdateAccount(token string)
 	Set(token string, date string, ct []byte) error
 	Enumerate(token string, from, to string) ([]store.BeautifulThing, error)
 }

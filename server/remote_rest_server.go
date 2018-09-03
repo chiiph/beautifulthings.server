@@ -55,6 +55,34 @@ func (rs *remoteRestServer) SignIn(b []byte) ([]byte, error) {
 	return sir.EncryptedToken, nil
 }
 
+func (rs *remoteRestServer) Bootstrap(token string) ([]byte, error) {
+	resp, err := http.Get(rs.urlWithToken(token, "bootstrap"))
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("Error bootstrapping: %d", resp.StatusCode)
+	}
+
+	payloadb, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer resp.Body.Close()
+
+	var payload store.BootstrapPayload
+	err = json.Unmarshal(payloadb, &payload)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return payload.EncryptedKey, nil
+}
+
+func (rs *remoteRestServer) UpdateAccount(token string) {
+	panic("not implemented")
+}
+
 func (rs *remoteRestServer) urlWithToken(token string, section ...string) string {
 	return fmt.Sprintf("%s/%s?token=%s", rs.addr, path.Join(section...), url.QueryEscape(token))
 }

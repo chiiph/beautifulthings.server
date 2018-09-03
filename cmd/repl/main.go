@@ -207,7 +207,7 @@ func main() {
 				handleError("Can't run set without being signed in", nil)
 				continue
 			}
-			ct, err := a.Encrypt(args[1])
+			ct, err := a.SymEncrypt(args[1])
 			if err != nil {
 				handleError("Encrypting input", err)
 				continue
@@ -229,7 +229,7 @@ func main() {
 			}
 
 			for i, item := range items {
-				m, err := a.Decrypt(item.Content)
+				m, err := a.SymDecrypt(item.Content)
 				if err != nil {
 					handleError("Decryptng entry", err)
 					continue

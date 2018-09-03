@@ -8,12 +8,11 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/nacl/box"
+	"golang.org/x/crypto/nacl/secretbox"
 )
 
 const dateLayout = "2006-01-02"
 const contentLength = 240
-const keyLength = 32
 
 func (s *server) Set(token string, date string, ct []byte) error {
 	a, err := s.validateSession(token)
@@ -26,7 +25,7 @@ func (s *server) Set(token string, date string, ct []byte) error {
 		return errors.Errorf("date too long: %d (max %d)", len(date), exactSize)
 	}
 
-	maxContent := contentLength + box.Overhead + keyLength
+	maxContent := contentLength + secretbox.Overhead + 24
 	if len(ct) > maxContent {
 		return errors.Errorf("content too long: %d (max %d)", len(ct), maxContent)
 	}
@@ -84,6 +83,20 @@ func (s *server) Enumerate(token string, from, to string) ([]store.BeautifulThin
 	}
 
 	return list, nil
+}
+
+func (s *server) Bootstrap(token string) ([]byte, error) {
+	a, err := s.validateSession(token)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return a.EncryptedKey, nil
+}
+
+func (s *server) UpdateAccount(token string) {
+	// TODO: remember to update the session
+	panic("not implemented")
 }
 
 // TODO: maybe move to utils?

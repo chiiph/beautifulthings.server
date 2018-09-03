@@ -28,14 +28,14 @@ func signup(t *testing.T, s server.Server, u, p string) *account.Account {
 }
 
 func set(t *testing.T, s server.Server, a *account.Account, token string, date, content string) {
-	ct, err := a.Encrypt(content)
+	ct, err := a.SymEncrypt(content)
 	require.NoError(t, err)
 	err = s.Set(token, date, ct)
 	require.NoError(t, err)
 }
 
 func setFails(t *testing.T, s server.Server, a *account.Account, token string, date, content string) {
-	ct, err := a.Encrypt(content)
+	ct, err := a.SymEncrypt(content)
 	require.NoError(t, err)
 	err = s.Set(token, date, ct)
 	require.Error(t, err)
@@ -66,7 +66,7 @@ func enumerate(t *testing.T, token string, s server.Server, a *account.Account, 
 
 	var got []item
 	for _, ctit := range res {
-		m, err := a.Decrypt(ctit.Content)
+		m, err := a.SymDecrypt(ctit.Content)
 		require.NoError(t, err)
 		it := item{
 			date:    ctit.Date.Format("2006-01-02"),

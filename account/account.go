@@ -12,19 +12,28 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/nacl/box"
+	"golang.org/x/crypto/nacl/secretbox"
 	"golang.org/x/crypto/scrypt"
 )
 
 type Account struct {
-	Username string
-	Pk       *[32]byte
-	Sk       *[32]byte `json:"-"`
-	Tz       string
-	Offset   int
+	Username     string
+	Pk           *[32]byte
+	Sk           *[32]byte `json:"-"`
+	Key          *[32]byte `json:"-"`
+	EncryptedKey []byte
+	Tz           string
+	Offset       int
 }
 
 func New(username, password string) (*Account, error) {
 	pk, sk, err := deriveKeyPair(username, password)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	var key [32]byte
+	_, err = rand.Read(key[:])
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -35,6 +44,7 @@ func New(username, password string) (*Account, error) {
 		Username: username,
 		Pk:       pk,
 		Sk:       sk,
+		Key:      &key,
 		Tz:       tz,
 		Offset:   offset,
 	}, nil
@@ -46,10 +56,29 @@ func FromBytes(b []byte) (*Account, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	if a.Sk != nil {
+		var key [32]byte
+		rawKey, err := a.Decrypt(a.EncryptedKey)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		copy(key[:], rawKey)
+		a.Key = &key
+	}
+
 	return a, nil
 }
 
 func (a *Account) Bytes() ([]byte, error) {
+	if a.Sk != nil {
+		encKey, err := a.Encrypt(string(a.Key[:]))
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		a.EncryptedKey = encKey
+	}
+
 	return json.Marshal(a)
 }
 
@@ -65,6 +94,33 @@ func ephNonce(epk, rpk *[32]byte) ([24]byte, error) {
 	nonceSlice := h.Sum(nil)
 	copy(nonce[:], nonceSlice)
 	return nonce, nil
+}
+
+func (a *Account) SymEncrypt(s string) ([]byte, error) {
+	if a.Key == nil {
+		return nil, errors.New("trying to encrypt without bootstrap")
+	}
+	var nonce [24]byte
+	_, err := rand.Read(nonce[:])
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	ct := secretbox.Seal(nonce[:], []byte(s), &nonce, a.Key)
+	return ct, nil
+}
+
+func (a *Account) SymDecrypt(c []byte) (string, error) {
+	if a.Key == nil {
+		return "", errors.New("trying to decrypt without bootstrap")
+	}
+	var nonce [24]byte
+	copy(nonce[:], c)
+	c = c[24:]
+	m, ok := secretbox.Open(nil, c, &nonce, a.Key)
+	if !ok {
+		return "", errors.New("error decrypting payload")
+	}
+	return string(m), nil
 }
 
 func (a *Account) Encrypt(s string) ([]byte, error) {

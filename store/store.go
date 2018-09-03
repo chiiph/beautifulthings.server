@@ -13,6 +13,10 @@ type BeautifulThing struct {
 	Extras  map[string][]string
 }
 
+type BootstrapPayload struct {
+	EncryptedKey []byte
+}
+
 var ErrNotFound = errors.New("does not exist")
 
 // ObjectStore is an enhanced Store that is used by the server. The enhancement is used for account logic

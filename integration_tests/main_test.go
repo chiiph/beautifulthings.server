@@ -43,6 +43,9 @@ func testBasicSignIn(t *testing.T, s server.Server) {
 	a := signup(t, s, "user1", "pass")
 	b := accBytes(t, a)
 
+	a.Key = nil
+	a.EncryptedKey = nil
+
 	cipherToken, err := s.SignIn(b)
 	require.NoError(t, err)
 	require.NotEmpty(t, cipherToken)
@@ -51,7 +54,17 @@ func testBasicSignIn(t *testing.T, s server.Server) {
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 
-	ct, err := a.Encrypt("test1")
+	encryptedKey, err := s.Bootstrap(token)
+	require.NoError(t, err)
+	skey, err := a.Decrypt(encryptedKey)
+	require.NoError(t, err)
+
+	var key [32]byte
+	copy(key[:], []byte(skey))
+	a.EncryptedKey = encryptedKey
+	a.Key = &key
+
+	ct, err := a.SymEncrypt("test1")
 	require.NoError(t, err)
 	err = s.Set(token, "2018-01-01", ct)
 	require.NoError(t, err)

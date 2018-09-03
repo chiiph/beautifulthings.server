@@ -68,6 +68,29 @@ func (rs *RestServer) signIn(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+func (rs *RestServer) bootstrap(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	payload, err := rs.s.Bootstrap(vars["token"])
+	if err != nil {
+		errorOut(w, r, err)
+		return
+	}
+
+	resp, err := json.Marshal(store.BootstrapPayload{payload})
+	if err != nil {
+		errorOut(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+func (rs *RestServer) updateAccount(w http.ResponseWriter, r *http.Request) {
+	panic("not implemented")
+}
+
 func (rs *RestServer) set(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -124,7 +147,9 @@ func ServeRest(ctx context.Context, addr string, store store.ObjectStore) (func(
 	r := mux.NewRouter()
 	r.HandleFunc("/signup", rs.signUp).Methods("POST")
 	r.HandleFunc("/signin", rs.signIn).Methods("POST")
+	r.HandleFunc("/bootstrap", rs.bootstrap).Methods("GET").Queries("token", "{token}")
 	r.HandleFunc("/things", rs.set).Methods("POST").Queries("token", "{token}")
+	r.HandleFunc("/updateAccount", rs.updateAccount).Methods("POST").Queries("token", "{token}")
 	r.HandleFunc("/things/{from}/{to}", rs.enumerate).Methods("GET").Queries("token", "{token}")
 	r.HandleFunc("/healthz", rs.healthz).Methods("GET")
 
