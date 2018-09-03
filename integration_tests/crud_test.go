@@ -49,6 +49,12 @@ func testAddEnumerateSkipOutside(t *testing.T, s server.Server) {
 	got := enumerate(t, token, s, a, "2018-01-01", "2018-01-30")
 	require.Len(t, got, 3)
 	require.Equal(t, items[:3], got)
+	got = enumerate(t, token, s, a, "2018-01-01", "2018-01-02")
+	require.Len(t, got, 2)
+	require.Equal(t, items[:2], got)
+	got = enumerate(t, token, s, a, "2018-01-01", "2018-01-01")
+	require.Len(t, got, 1)
+	require.Equal(t, items[:1], got)
 }
 
 func TestAddEnumerateSkipOutside(t *testing.T) {
